@@ -32,3 +32,9 @@
   - name: Add new droplet to dynamic asset list
     add_host: name="{{ item.droplet.ip_address }}" groups="webservers"
     with_items: "{{ droplet_details.results }}"
+
+  - name: Wait for server to become available
+    wait_for:
+      host: "{{ item.droplet.ip_address }}"
+      port: 22
+    with_items: " {{ droplet_details.results }}"
