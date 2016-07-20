@@ -1,0 +1,3 @@
+---
+- name: "Summary"
+  debug: msg="Your hidden service is now configured. You can access it at http://{{ hs_hostname.stdout }}. You can edit the default page at /var/www/html/index.html on the host."

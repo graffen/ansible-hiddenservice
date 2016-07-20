@@ -1,0 +1,40 @@
+---
+- name: Add Tor repository key
+  apt_key:
+    keyserver: pgp.key-server.io
+    id: A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89
+
+- name: Add Tor repository
+  apt_repository:
+    repo: "deb http://deb.torproject.org/torproject.org jessie main"
+    state: present
+
+- name: Install Tor
+  apt:
+    name: "tor"
+    state: latest
+
+- name: Configure Tor
+  template:
+    src: torrc.j2
+    dest: /etc/tor/torrc
+
+- name: Create hidden service directory
+  file:
+    path: /var/lib/tor/hidden_service
+    state: directory
+    owner: debian-tor
+    group: debian-tor
+    mode: 0700
+
+- name: Restart Tor service
+  service:
+    name: tor
+    state: restarted
+  
+- name: Wait for Tor HS directory to become available
+  wait_for: path=/var/lib/tor/hidden_service/hostname
+
+- name: Register HS host name
+  shell: cat /var/lib/tor/hidden_service/hostname
+  register: hs_hostname

@@ -1,0 +1,10 @@
+---
+- include: nginx.yml
+
+- name: Test nginx configuration
+  command: /usr/sbin/nginx -t
+
+- name: Restart nginx
+  service: 
+    name: nginx
+    state: restarted
