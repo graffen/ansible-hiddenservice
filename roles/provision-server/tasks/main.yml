@@ -18,23 +18,20 @@
     digital_ocean:
       state: present
       command: droplet
-      name: "{{ item }}"
-      unique_name: yes
+      name: "{{ droplet_name }}"
+      unique_name: "{{ unique_name }}"
       size_id: 512mb
       region_id: ams2
       image_id: debian-8-x64
       ssh_key_ids: "{{ my_ssh_key.ssh_key.id }}"
       api_token: "{{ do_token }}"
       wait: yes
-    with_items: "{{ droplets }}"
     register: droplet_details
 
   - name: Add new droplet to dynamic asset list
-    add_host: name="{{ item.droplet.ip_address }}" groups="webservers"
-    with_items: "{{ droplet_details.results }}"
+    add_host: name="{{ droplet_details.droplet.ip_address }}" groups="webservers"
 
   - name: Wait for server to become available
     wait_for:
-      host: "{{ item.droplet.ip_address }}"
+      host: "{{ droplet_details.droplet.ip_address }}"
       port: 22
-    with_items: " {{ droplet_details.results }}"
